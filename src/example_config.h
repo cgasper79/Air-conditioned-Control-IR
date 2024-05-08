@@ -43,6 +43,7 @@ const char* 		MQTT_BROKER_ADRESS = "your.host.mqtt";
 bool controlEnableIR = false;
 bool controlTimer = false;
 bool adjustTemp = false;
+bool aliveControl = false;
 
 
 #ifdef MQTT_TLS
