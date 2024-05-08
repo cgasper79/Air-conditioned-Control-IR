@@ -116,6 +116,14 @@ void loop()
     adjustTemp = false;
   }
 
+  // Alive Control Ac
+  if (aliveControl){
+    Serial.println ("Alive Control");
+    waitRead();
+    PublisMqtt (VERSION,miRSSI,miIP,"Alive");
+    aliveControl = false;
+  }
+
   ReconnectionWifi();
   
   //Deep Sleep only 10 seconds connected

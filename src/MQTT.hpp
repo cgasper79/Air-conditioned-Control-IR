@@ -81,6 +81,11 @@ void OnMqttReceived(char* topic, byte* payload, unsigned int length)
 			controlEnableIR = false;
 		}
 
+		if (content == "alive"){
+			Serial.println("Control Alive");
+			aliveControl = true;	
+		}
+
 		if (controlEnableIR){
 			if (content == "timer"){
 				Serial.println("on timer");

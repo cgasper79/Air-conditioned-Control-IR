@@ -38,6 +38,7 @@ Once the device is powered and connected to the Wi-Fi network, it will listen fo
 - `disable`: Disable the air conditioner control.
 - `timer`: Send the command to disconnect the air conditioner.
 - `adjust`: Adjust the air conditioner temperature to a predetermined value.
+- `alive`: Send the command alive
 
 The control flow created in Node-RED will handle these MQTT messages and send the corresponding commands to the Wemos D1 mini. Additionally, it will monitor the room temperature and send timer or adjust commands accordingly.
 
