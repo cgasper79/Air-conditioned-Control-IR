@@ -106,7 +106,7 @@
         "expiry": "",
         "broker": "8be7297a9b02cb9a",
         "x": 630,
-        "y": 300,
+        "y": 340,
         "wires": []
     },
     {
@@ -120,7 +120,7 @@
         "comment": "",
         "lat": 0,
         "lon": 0,
-        "starttime": "480",
+        "starttime": "660",
         "endtime": "1200",
         "starttime2": "0",
         "endtime2": "0",
@@ -319,7 +319,7 @@
         "template": "V1.0",
         "output": "str",
         "x": 550,
-        "y": 360,
+        "y": 400,
         "wires": [
             [
                 "483147a9afe81020"
@@ -341,7 +341,7 @@
         "expiry": "",
         "broker": "8be7297a9b02cb9a",
         "x": 830,
-        "y": 360,
+        "y": 400,
         "wires": []
     },
     {
@@ -381,7 +381,7 @@
         "entity_location": "data",
         "override_data": "msg",
         "x": 310,
-        "y": 240,
+        "y": 280,
         "wires": [
             [
                 "71401d0cef7cde88",
@@ -412,7 +412,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 110,
-        "y": 240,
+        "y": 280,
         "wires": [
             [
                 "01303c76a86a4412",
@@ -434,7 +434,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 890,
-        "y": 240,
+        "y": 280,
         "wires": []
     },
     {
@@ -460,7 +460,7 @@
         "repair": false,
         "outputs": 2,
         "x": 540,
-        "y": 240,
+        "y": 280,
         "wires": [
             [
                 "9883509a6183dcef"
@@ -490,7 +490,7 @@
         "to": "",
         "reg": false,
         "x": 710,
-        "y": 260,
+        "y": 300,
         "wires": [
             [
                 "712e3ecadde6481a",
@@ -518,7 +518,7 @@
         "to": "",
         "reg": false,
         "x": 710,
-        "y": 220,
+        "y": 260,
         "wires": [
             [
                 "712e3ecadde6481a",
@@ -544,7 +544,7 @@
         "allowrate": false,
         "outputs": 1,
         "x": 130,
-        "y": 320,
+        "y": 360,
         "wires": [
             [
                 "21be82bf623bb927"
@@ -588,12 +588,61 @@
         "entity_location": "data",
         "override_data": "msg",
         "x": 330,
-        "y": 320,
+        "y": 360,
         "wires": [
             [
                 "71401d0cef7cde88",
                 "d4099d77e92505f6",
                 "8f6c79a1d05e1c40"
+            ]
+        ]
+    },
+    {
+        "id": "df63737ce74139b8",
+        "type": "inject",
+        "z": "8050f91c7a5b6e89",
+        "name": "95 minutos",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5700",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 200,
+        "wires": [
+            [
+                "c5dfa204cb170b7d"
+            ]
+        ]
+    },
+    {
+        "id": "c5dfa204cb170b7d",
+        "type": "template",
+        "z": "8050f91c7a5b6e89",
+        "name": "alive",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "alive",
+        "output": "str",
+        "x": 430,
+        "y": 200,
+        "wires": [
+            [
+                "712e3ecadde6481a",
+                "440113bcdd685f14"
             ]
         ]
     },
