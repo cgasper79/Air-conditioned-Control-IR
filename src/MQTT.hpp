@@ -21,7 +21,7 @@ void MqttHomeAssistantDiscovery()
 	String strPayload;
 
     //Generate de MQTT UNIQUE ID FROM MAC
-    for (int i=8; i < macAddr.length(); i++ )
+    for (int i=8; i < (int)macAddr.length(); i++ )
     {
         MQTT_UNIQUE_ID.concat(String(macAddr[i],HEX));
     }
@@ -36,11 +36,10 @@ void MqttHomeAssistantDiscovery()
 
 		/*Control AC*/
 
-		discoveryTopic = "homeassistant/sensor/" + MQTT_UNIQUE_ID + "/" + MQTT_CLIENT_NAME + "/config";
-    
+		discoveryTopic = "homeassistant/climate/" + MQTT_UNIQUE_ID + "/" + MQTT_CLIENT_NAME + "/config";
         payload["name"] = MQTT_CLIENT_NAME + "Control";
         payload["uniq_id"] = MQTT_UNIQUE_ID + "_AC";
-        payload["stat_t"] = MQTT_STATUS_TOPIC;
+        //payload["stat_t"] = MQTT_STATUS_TOPIC;
         payload["dev_cla"] = "control";
         device = payload.createNestedObject("device");
         device["name"] = MQTT_CLIENT_NAME;
@@ -56,25 +55,52 @@ void MqttHomeAssistantDiscovery()
 
 
 // When MQTT received
-void OnMqttReceived(char* topic, byte* inFrame, unsigned int length) 
+String content = "";
+void OnMqttReceived(char* topic, byte* payload, unsigned int length) 
 {
-    Serial.print("Message arrived on topic: ");
-    Serial.print(topic);
-    Serial.print(". Message: ");
-    String messageTemp;
-    
-    for (int i = 0; i < length; i++) 
+  Serial.print("Received on ");
+  Serial.print(topic);
+  Serial.print(": ");
+
+  content = "";  
+  for (size_t i = 0; i < (int)length; i++) {
+    content.concat((char)payload[i]);
+  }
+  Serial.print(content);
+  Serial.println();
+
+  if(String(topic) == String(MQTT_SET_TOPIC)) 
     {
-        Serial.print((char)inFrame[i]);
-        messageTemp += (char)inFrame[i];
+        if(content == "enable"){
+			Serial.println("Conectamos control");
+			controlEnableIR = true;
+		} 
+
+		if (content == "disable"){
+			Serial.println("Desconectamos control");
+			controlEnableIR = false;
+		}
+
+		if (controlEnableIR){
+			if (content == "timer"){
+				Serial.println("on timer");
+				controlTimer = true;
+			}
+		}
+
+		if (content == "adjust"){
+			Serial.println ("Ajuste temperatura");
+			adjustTemp = true;
+		}
+		       
     }
-    Serial.println();
-  
-    if(String(topic) == String("homeassistant/status")) 
+
+	if(String(topic) == String("homeassistant/status")) 
     {
-        if(messageTemp == "online")
-            MqttHomeAssistantDiscovery();
-    }
+		if(content == "online"){
+			MqttHomeAssistantDiscovery();
+		}
+	}
 }
 
 
@@ -96,8 +122,12 @@ void InitMqtt()
 //Subscribe MQTT Topic for Discovery HomeAssistant
 void SuscribeMqtt()
 {
-	mqttClient.subscribe("homeassistant/status");
-	Serial.println ("Topic Subscribed");
+  mqttClient.subscribe(MQTT_SET_TOPIC.c_str());
+  Serial.println("Topic Set Subscribe");
+
+  mqttClient.subscribe( MQTT_STATUS_TOPIC.c_str());
+  Serial.println("Topic Status Subscribe");
+ 
 }
 
 // connect MQTT
@@ -134,14 +164,18 @@ void HandleMqtt()
 
 //Publish Mqtt
 
-void PublisMqtt ( String msg )
+void PublisMqtt ( String msg, String msg2, IPAddress msg3, String msg4 )
 {
-    StaticJsonDocument<200> payload;  
-    payload["ac"] = msg;
+   
+    StaticJsonDocument<600> payload;  
+    payload["FW"] = msg;
+	payload["RSSI"] = msg2;
+	payload["IP"] = msg3;
+	payload["msg"] = msg4;
 
     String strPayload;
     serializeJson(payload, strPayload);
-
+    
     if(mqttClient.connected())
     {
         mqttClient.publish(MQTT_STATUS_TOPIC.c_str(), strPayload.c_str()); 
