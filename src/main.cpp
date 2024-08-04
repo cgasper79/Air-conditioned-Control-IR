@@ -2,8 +2,8 @@
  * @file main.cpp
  * @author cgasper79
  * @brief 
- * @version 1.0
- * @date 2024-04-29
+ * @version 1.1
+ * @date 2024-07-20
  * 
  * @copyright Copyright (c) 2024
  * 
@@ -22,19 +22,18 @@
 #include "config.h"
 #include "WifiUtils.hpp"
 #include "MQTT.hpp"
+#include "function.hpp"
 
 
 #define IRVCC    5      // Pin connected to the VCC DHT sensor - Pin D1 (GPIO5)
 
 //Global Variables
 bool g_InitSystem = true;
-const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
-IRDaikinESP ac(kIrLed);  // Set the GPIO to be used to sending the message
-uint32_t delayMS = 1000;
 bool lastControlEnableIR = false;
 
 //Setup
-void setup() {
+void setup() 
+{
   Serial.begin(9600);
   pinMode(LED_BUILTIN, OUTPUT); // Led Wifi connection
   pinMode(IRVCC, OUTPUT); // Power Supply DHT11 - Pin D1 (GPIO5)
@@ -43,17 +42,6 @@ void setup() {
   InitMqtt(); //Ini MQTT
 
   ac.begin(); //ini Ac
-  
-}
-
-//Wait to read
-void waitRead(){
- //Serial.println("Esperando 1 segundo");
- while ((currentMillis - previousMillis) <= delayMS){
-    currentMillis = millis();
-  }
-  previousMillis = currentMillis;
-  currentMillis = millis();
 }
 
 //Main Loop
@@ -71,6 +59,7 @@ void loop()
     MqttHomeAssistantDiscovery();     // Send Discovery Data
     Serial.println ("Sensor Unique ID: " + MQTT_UNIQUE_ID);
     Serial.println ("Sensor FW Version: " + String(MQTT_SW_VERSION));
+    PublisMqtt (VERSION,miRSSI,miIP,"Alive");
   }
 
   //Enable or Disable IR
@@ -92,37 +81,7 @@ void loop()
   
   delay(100);
   
-  // Timer Power Off AC 
-  if(controlTimer && controlEnableIR) {
-    Serial.println ("Desconexión AA por tiempo");
-    for (int i = 0; i <= 2; i++){
-      ac.off();
-      ac.send();
-      waitRead();
-    }
-    PublisMqtt (VERSION,miRSSI,miIP,"Desconectado");
-    controlTimer = false;
-  } 
-
-  // Adjust Temperature AC
-  if (controlTimer && adjustTemp){
-    Serial.println ("Ajustando temperatura");
-    ac.setFan(1);
-    ac.setMode(kDaikinCool);
-    ac.setTemp(22);
-    ac.send();
-    waitRead();
-    PublisMqtt (VERSION,miRSSI,miIP,"Ajustando Temp");
-    adjustTemp = false;
-  }
-
-  // Alive Control Ac
-  if (aliveControl){
-    Serial.println ("Alive Control");
-    waitRead();
-    PublisMqtt (VERSION,miRSSI,miIP,"Alive");
-    aliveControl = false;
-  }
+  setFunctionAc();
 
   ReconnectionWifi();
   
@@ -135,4 +94,5 @@ void loop()
   #endif
   delay(200);
 }
+
 

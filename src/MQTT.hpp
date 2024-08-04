@@ -56,22 +56,35 @@ void MqttHomeAssistantDiscovery()
 
 // When MQTT received
 String content = "";
-void OnMqttReceived(char* topic, byte* payload, unsigned int length) 
-{
-  Serial.print("Received on ");
-  Serial.print(topic);
-  Serial.print(": ");
+void OnMqttReceived(char* topic, byte* payload, unsigned int length) {
+	Serial.print("Received on ");
+  	Serial.print(topic);
+  	Serial.print(": ");
 
-  content = "";  
-  for (size_t i = 0; i < (int)length; i++) {
-    content.concat((char)payload[i]);
-  }
-  Serial.print(content);
-  Serial.println();
+	for (int i = 0; i <= 2; i++){
+		digitalWrite(LED_BUILTIN, HIGH);
+		delay(200);
+		digitalWrite(LED_BUILTIN, LOW);
+		delay(200);
+	}
+	
 
-  if(String(topic) == String(MQTT_SET_TOPIC)) 
-    {
-        if(content == "enable"){
+  	content = "";  
+  	for (size_t i = 0; i < (int)length; i++) {
+    	content.concat((char)payload[i]);
+  	}
+  	Serial.print(content);
+  	Serial.println();
+
+	if(String(topic) == String(MQTT_DISCOVERY_TOPIC)) {
+		if(content == "online"){
+			MqttHomeAssistantDiscovery();
+		}
+	}
+
+  	if(String(topic) == String(MQTT_SET_TOPIC)) {
+
+		if(content == "enable"){
 			Serial.println("Conectamos control");
 			controlEnableIR = true;
 		} 
@@ -86,26 +99,30 @@ void OnMqttReceived(char* topic, byte* payload, unsigned int length)
 			aliveControl = true;	
 		}
 
+
 		if (controlEnableIR){
+
 			if (content == "timer"){
 				Serial.println("on timer");
-				controlTimer = true;
+				timerOffEnable = true;
 			}
-		}
+			
+			if (content == "adjust"){
+				Serial.println ("Ajuste temperatura");
+				adjustTemp = true;
+			}
 
-		if (content == "adjust"){
-			Serial.println ("Ajuste temperatura");
-			adjustTemp = true;
-		}
-		       
-    }
+			if (content == "dry"){
+				Serial.println ("Mode Dry");
+				adjustModeDry = true;
+			}
 
-	if(String(topic) == String("homeassistant/status")) 
-    {
-		if(content == "online"){
-			MqttHomeAssistantDiscovery();
-		}
-	}
+			if (content == "off"){
+				Serial.println ("Power Off Ac");
+				powerOffAc = true;
+			}
+		}	       
+    }	
 }
 
 
@@ -130,7 +147,7 @@ void SuscribeMqtt()
   mqttClient.subscribe(MQTT_SET_TOPIC.c_str());
   Serial.println("Topic Set Subscribe");
 
-  mqttClient.subscribe( MQTT_STATUS_TOPIC.c_str());
+  mqttClient.subscribe( MQTT_DISCOVERY_TOPIC.c_str());
   Serial.println("Topic Status Subscribe");
  
 }
@@ -183,7 +200,7 @@ void PublisMqtt ( String msg, String msg2, IPAddress msg3, String msg4 )
     
     if(mqttClient.connected())
     {
-        mqttClient.publish(MQTT_STATUS_TOPIC.c_str(), strPayload.c_str()); 
+        mqttClient.publish(MQTT_STATUS_TOPIC.c_str(), strPayload.c_str(),true); 
     }
 	
 }

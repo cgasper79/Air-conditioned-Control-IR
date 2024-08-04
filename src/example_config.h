@@ -1,5 +1,5 @@
 //Version
-String VERSION = "v1.0";
+String VERSION = "v1.1";
 
 //define user, if you don't use comment please
 #define MQTT_TLS  // to use MQTT TLS 
@@ -41,8 +41,10 @@ const char* 		MQTT_BROKER_ADRESS = "your.host.mqtt";
 
 //Variables globales
 bool controlEnableIR = false;
-bool controlTimer = false;
+bool timerOffEnable = false;
+bool powerOffAc = false;
 bool adjustTemp = false;
+bool adjustModeDry = false;
 bool aliveControl = false;
 
 

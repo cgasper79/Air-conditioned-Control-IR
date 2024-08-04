@@ -36,7 +36,8 @@ This project aims to control an air conditioner using an infrared (IR) emitter c
 Once the device is powered and connected to the Wi-Fi network, it will listen for MQTT messages to control the air conditioner. The following four values can be sent via MQTT:
 - `enable`: Enable the air conditioner control.
 - `disable`: Disable the air conditioner control.
-- `timer`: Send the command to disconnect the air conditioner.
+- `off`: Send the command to disconnect the air conditioner.
+- `timer`: Send command to enable the timer in 1 hour to power off the air conditioner.
 - `adjust`: Adjust the air conditioner temperature to a predetermined value.
 - `alive`: Send the command alive
 
