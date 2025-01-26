@@ -1,7 +1,10 @@
 //Global Variables
 const uint16_t kIrLed = 4;  // ESP8266 GPIO pin to use. Recommended: 4 (D2).
 IRDaikinESP ac(kIrLed);  // Set the GPIO to be used to sending the message
-uint32_t delayMS = 500;
+uint32_t delayMS = 500;  //Delay Time
+int pulseSend = 4;   //Number of pulses to send from IR
+
+
 
 //Wait to read
 void waitRead(){
@@ -25,7 +28,7 @@ void setFunctionAc()
             digitalWrite(LED_BUILTIN, HIGH);
             Serial.println ("Desconexión AA por tiempo");
             ac.off();
-            ac.send(3);
+            ac.send(pulseSend);
             waitRead();
             PublisMqtt (VERSION,miRSSI,miIP,"Desconectado");
             powerOffAc = false;
@@ -41,7 +44,7 @@ void setFunctionAc()
             ac.setFan(kDaikinFanAuto);
             ac.setMode(kDaikinAuto);
             ac.setTemp(22);
-            ac.send(2);
+            ac.send(pulseSend);
             waitRead();
             PublisMqtt (VERSION,miRSSI,miIP,"Ajustando Temperatura");
             adjustTemp = false;
@@ -55,7 +58,7 @@ void setFunctionAc()
             Serial.println ("Mode Dry");
             ac.setFan(kDaikinFanAuto);
             ac.setMode(kDaikinDry);
-            ac.send(2);
+            ac.send(pulseSend);
             waitRead();
             PublisMqtt (VERSION,miRSSI,miIP,"Mode Dry");
             adjustModeDry = false;
@@ -68,7 +71,7 @@ void setFunctionAc()
             digitalWrite(LED_BUILTIN, HIGH);
             Serial.println ("TimerOff On");
             ac.enableOffTimer(60);
-            ac.send(2);
+            ac.send(pulseSend);
             waitRead();
             PublisMqtt (VERSION,miRSSI,miIP,"TimerOff On");
             timerOffEnable = false;
